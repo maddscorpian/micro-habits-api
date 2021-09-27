@@ -12,6 +12,7 @@ const consts = require('./appConstants');
 var CONNECTION_STRING = consts.APP_CONSTANTS.MONGO_DB_CON_STR;
 
 var cors = require('cors');
+const { Timestamp } = require("bson");
 
 app.use(cors())
 
@@ -21,7 +22,8 @@ var database;
 
 app.listen(49146, () => {
 
-    MongoClient.connect(CONNECTION_STRING, { useNewUrlParser: true }, (error, client) => {
+    MongoClient.connect(consts.APP_CONSTANTS.MONGO_LOCAL, { useNewUrlParser: true }, (error, client) => {
+        console.log(error);
         database = client.db(DATABASE);
         console.log("Mongo DB Connection Successfull");
     })
@@ -72,6 +74,36 @@ app.delete('/api/habit/:id', (request, response) => {
 })
 
 
+// Habit log add Api. 
+app.post('/api/habit-log', (request, response) => {
+    console.log('Adding habit' + request.body['name'] +' ' + request.body['count'],);
+    
+    // Check if it already exists. 
+    // TO-DO
+    // If not add it. 
+    database.collection("habit-log").insertOne({
+        name: request.body['name'],
+        count: request.body['count'],
+        ts: new Timestamp()
+    });
+
+    response.json("Added Successfully");
+
+})
+
+
+
+
+// Habit log get API
+app.get('/api/habit-log', (request, response) => {
+    console.log('Getting habits log');
+    database.collection("habit-log").find({}).toArray((error, result) => {
+        if (error) {
+            console.log(error);
+        }
+        response.send(result);
+    })
+});
 
 
 
