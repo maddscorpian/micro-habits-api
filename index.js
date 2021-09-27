@@ -84,7 +84,7 @@ app.post('/api/habit-log', (request, response) => {
     database.collection("habit-log").insertOne({
         name: request.body['name'],
         count: request.body['count'],
-        ts: new Timestamp()
+        ts: request.body['ts']
     });
 
     response.json("Added Successfully");
